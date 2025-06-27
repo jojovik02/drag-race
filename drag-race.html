@@ -2,11 +2,142 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8" />
-    <title>Drag Race Simulator</title>
+    <title>RuPaul’s Drag Race Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff0f6;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #e91e63;
+        }
+        button {
+            background-color: #e91e63;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        button:hover {
+            background-color: #c2185b;
+        }
+        .result {
+            font-size: 1.3em;
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #fce4ec;
+            color: #880e4f;
+            min-height: 100px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Drag Race Simulator</h1>
-    <p>Här kommer simulatorn snart!</p>
-    <a href="index.html">Tillbaka till startsidan</a>
+    <h1>RuPaul’s Drag Race Simulator</h1>
+
+    <div>
+        <label for="queenSelect">Välj din queen:</label><br />
+        <select id="queenSelect"></select>
+    </div>
+
+    <div>
+        <label for="challengeSelect">Välj challenge:</label><br />
+        <select id="challengeSelect"></select>
+    </div>
+
+    <button id="simulateBtn">Starta simulering</button>
+
+    <div class="result" id="resultArea">Tryck på "Starta simulering" för att köra!</div>
+
+<script>
+const queens = [
+    "Bianca Del Rio",
+    "Trixie Mattel",
+    "Jinkx Monsoon",
+    "Shangela",
+    "Alaska",
+    "Sasha Velour",
+    "Aquaria",
+    "Monet X Change",
+    "Gottmik",
+    "Violet Chachki"
+];
+
+const challenges = [
+    "Snatch Game",
+    "Rusical",
+    "Ball Challenge",
+    "Makeover",
+    "Talent Show",
+    "Acting Challenge",
+    "Design Challenge",
+    "Lipsync Battle"
+];
+
+const songs = [
+    "Sissy That Walk",
+    "Cover Girl",
+    "Call Me Mother",
+    "Kitty Girl",
+    "Champion",
+    "Super Queen",
+    "Read U Wrote U",
+    "I’m a Winner, Baby"
+];
+
+function getRandomItem(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function simulate() {
+    const selectedQueen = document.getElementById("queenSelect").value;
+    const selectedChallenge = document.getElementById("challengeSelect").value;
+    const song = getRandomItem(songs);
+
+    // Enkel slumpmässig bedömning
+    const performance = Math.random();
+
+    let outcome = "";
+    if (performance > 0.7) {
+        outcome = `${selectedQueen} slår knock out i ${selectedChallenge} och levererar en fantastisk prestation! 🎉`;
+    } else if (performance > 0.4) {
+        outcome = `${selectedQueen} gör ett stabilt framträdande i ${selectedChallenge}, men kan förbättras.`;
+    } else {
+        outcome = `Uh oh, ${selectedQueen} kämpar i ${selectedChallenge} och riskerar eliminering... 😬`;
+    }
+
+    const resultArea = document.getElementById("resultArea");
+    resultArea.innerHTML = `
+        <p>${outcome}</p>
+        <p>🎵 Låt: <strong>${song}</strong></p>
+    `;
+}
+
+// Fyll dropdowns med data
+function fillDropdown(id, arr) {
+    const select = document.getElementById(id);
+    arr.forEach(item => {
+        const option = document.createElement("option");
+        option.value = item;
+        option.textContent = item;
+        select.appendChild(option);
+    });
+}
+
+document.getElementById("simulateBtn").addEventListener("click", simulate);
+
+fillDropdown("queenSelect", queens);
+fillDropdown("challengeSelect", challenges);
+</script>
+
 </body>
 </html>
