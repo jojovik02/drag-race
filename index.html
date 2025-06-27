@@ -1,149 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Drag Race Simulator - Custom Version</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" />
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #1c1c1c;
-      color: #fff;
-      font-family: 'Montserrat', sans-serif;
-    }
-    header {
-      background-color: #d81b60;
-      padding: 20px;
-      text-align: center;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 2.5rem;
-      color: #fff;
-    }
-    main {
-      max-width: 900px;
-      margin: auto;
-      padding: 20px;
-    }
-    .select-wrapper, button, #logg {
-      margin-top: 20px;
-    }
-    select, button {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-    }
-    button {
-      background-color: #d81b60;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #ad1457;
-    }
-    #logg {
-      background-color: #2c2c2c;
-      padding: 20px;
-      border-radius: 5px;
-      white-space: pre-line;
-      font-size: 14px;
-    }
-    .queen-option {
-      display: flex;
-      align-items: center;
-    }
-    .queen-option img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      margin-right: 10px;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chartemis Simulations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 100px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 40px;
+        }
+        .link-button {
+            display: inline-block;
+            margin: 20px;
+            padding: 20px 40px;
+            font-size: 1.5em;
+            background-color: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+        .link-button:hover {
+            background-color: #005f99;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>🌈 Drag Race Simulator</h1>
-  </header>
-  <main>
-    <div class="select-wrapper">
-      <select id="queenSelect" multiple="multiple"></select>
-      <button onclick="startSeason()">Start Season</button>
-      <button onclick="nextEpisode()">Next Episode</button>
-    </div>
-    <div id="logg"></div>
-  </main>
-
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-  <script>
-    let queens = [];
-
-    fetch('drag_race_queens_full.json')
-      .then(response => response.json())
-      .then(data => {
-        queens = data;
-        $('#queenSelect').select2({
-          placeholder: "Select your queens",
-          data: queens.map(q => ({ id: q.name, text: `${q.name} (${q.season})` })),
-          templateResult: formatQueen,
-          templateSelection: formatQueen
-        });
-      });
-
-    function formatQueen(queen) {
-      if (!queen.id) return queen.text;
-      const match = queens.find(q => q.name === queen.id);
-      if (!match) return queen.text;
-      const img = `<img src="${match.image}" alt="${match.name}" />`;
-      return $(`<span class='queen-option'>${img} ${match.name}</span>`);
-    }
-
-    let selectedQueens = [], logg = "";
-
-    function startSeason() {
-      selectedQueens = $('#queenSelect').val();
-      if (!selectedQueens || selectedQueens.length < 2) {
-        alert("Please select at least 2 queens.");
-        return;
-      }
-      logg = `🎉 Season starts with:
-${selectedQueens.join("
-")}`;
-      $('#logg').text(logg);
-    }
-
-    function nextEpisode() {
-      if (selectedQueens.length <= 1) {
-        logg += `
-👑 The winner is: ${selectedQueens[0]}!`;
-        $('#logg').text(logg);
-        return;
-      }
-      const themes = ["Snatch Game", "Ball Challenge", "Rusical", "Makeover"];
-      const songs = ["Sissy That Walk", "Call Me Mother", "Toxic", "Rain On Me"];
-      const theme = themes[Math.floor(Math.random() * themes.length)];
-      const song = songs[Math.floor(Math.random() * songs.length)];
-      const shuffled = [...selectedQueens].sort(() => 0.5 - Math.random());
-      const winner = shuffled[0];
-      const bottom = shuffled.slice(-2);
-      const eliminated = bottom[Math.floor(Math.random() * bottom.length)];
-      selectedQueens = selectedQueens.filter(q => q !== eliminated);
-      logg += `
-
-🎬 Theme: ${theme}
-🏆 Winner: ${winner}
-💄 Bottom: ${bottom.join(" vs. ")}
-🎶 Lipsync: ${song}
-💋 Eliminated: ${eliminated}`;
-      $('#logg').text(logg);
-    }
-  </script>
+    <h1>Chartemis Simulations</h1>
+    <a href="drag-race.html" class="link-button">Drag Race Simulator</a>
+    <a href="amazing-race.html" class="link-button">The Amazing Race Simulator</a>
 </body>
 </html>
