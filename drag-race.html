@@ -1,142 +1,239 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <meta charset="UTF-8" />
-    <title>RuPaul’s Drag Race Simulator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            background-color: #fff0f6;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        h1 {
-            color: #e91e63;
-        }
-        button {
-            background-color: #e91e63;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 20px 0;
-        }
-        button:hover {
-            background-color: #c2185b;
-        }
-        .result {
-            font-size: 1.3em;
-            margin-top: 25px;
-            padding: 15px;
-            border-radius: 10px;
-            background-color: #fce4ec;
-            color: #880e4f;
-            min-height: 100px;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RuPaul’s Drag Race Simulator</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 700px;
+    margin: 30px auto;
+    background: #fce4ec;
+    color: #4a148c;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(132, 14, 90, 0.3);
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #880e4f;
+  }
+  label, select, button {
+    font-size: 1.1em;
+  }
+  select {
+    padding: 8px;
+    border-radius: 8px;
+    border: 2px solid #880e4f;
+    margin-top: 8px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 200px;
+  }
+  button {
+    background-color: #880e4f;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    margin-bottom: 20px;
+  }
+  button:hover:not(:disabled) {
+    background-color: #a41f6f;
+  }
+  button:disabled {
+    background-color: #ccc;
+    cursor: default;
+  }
+  .queens-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .queen {
+    background: #e1bee7;
+    color: #4a148c;
+    padding: 12px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    box-shadow: 0 0 5px rgba(132,14,90,0.3);
+    user-select: none;
+    min-width: 120px;
+    text-align: center;
+  }
+  .queen.eliminated {
+    background: #d1c4e9;
+    color: #999;
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+  .status-text {
+    font-size: 1.2em;
+    text-align: center;
+    min-height: 70px;
+    margin-bottom: 20px;
+  }
+  .winner-text {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #c2185b;
+    text-align: center;
+    margin-top: 30px;
+  }
+</style>
 </head>
 <body>
-    <h1>RuPaul’s Drag Race Simulator</h1>
 
-    <div>
-        <label for="queenSelect">Välj din queen:</label><br />
-        <select id="queenSelect"></select>
-    </div>
+<h1>RuPaul’s Drag Race Simulator</h1>
 
-    <div>
-        <label for="challengeSelect">Välj challenge:</label><br />
-        <select id="challengeSelect"></select>
-    </div>
+<label for="numQueens">Välj antal queens (2–20):</label><br />
+<select id="numQueens">
+  <!-- options kommer via JS -->
+</select>
 
-    <button id="simulateBtn">Starta simulering</button>
+<button id="startBtn">Starta tävlingen</button>
 
-    <div class="result" id="resultArea">Tryck på "Starta simulering" för att köra!</div>
+<div class="queens-list" id="queensList" style="display:none;"></div>
+
+<div class="status-text" id="statusText"></div>
+
+<button id="nextRoundBtn" style="display:none;">Nästa runda</button>
+
+<div class="winner-text" id="winnerText"></div>
 
 <script>
-const queens = [
-    "Bianca Del Rio",
-    "Trixie Mattel",
-    "Jinkx Monsoon",
-    "Shangela",
-    "Alaska",
-    "Sasha Velour",
-    "Aquaria",
-    "Monet X Change",
-    "Gottmik",
-    "Violet Chachki"
+const allQueens = [
+  "Bianca Del Rio", "Trixie Mattel", "Jinkx Monsoon", "Shangela", "Alaska",
+  "Sasha Velour", "Aquaria", "Monet X Change", "Gottmik", "Violet Chachki",
+  "Willam", "Katya", "Bob The Drag Queen", "Adore Delano", "Peppermint",
+  "Kim Chi", "Naomi Smalls", "Manila Luzon", "BenDeLaCreme", "Milk",
+  "Alaska Thunderfuck", "Phi Phi O’Hara", "Raja", "Jujubee", "Detox",
+  "Laganja Estranja", "Shea Couleé", "Eureka O’Hara", "Miz Cracker", "Vixen"
 ];
 
 const challenges = [
-    "Snatch Game",
-    "Rusical",
-    "Ball Challenge",
-    "Makeover",
-    "Talent Show",
-    "Acting Challenge",
-    "Design Challenge",
-    "Lipsync Battle"
+  "Snatch Game", "Rusical", "Ball Challenge", "Makeover", "Talent Show",
+  "Acting Challenge", "Design Challenge", "Lipsync Battle", "Dance Off",
+  "Comedy Challenge", "Photoshoot", "Runway Walk"
 ];
 
 const songs = [
-    "Sissy That Walk",
-    "Cover Girl",
-    "Call Me Mother",
-    "Kitty Girl",
-    "Champion",
-    "Super Queen",
-    "Read U Wrote U",
-    "I’m a Winner, Baby"
+  "Sissy That Walk", "Cover Girl", "Call Me Mother", "Kitty Girl", "Champion",
+  "Super Queen", "Read U Wrote U", "I’m a Winner, Baby"
 ];
 
+let activeQueens = [];
+let eliminatedQueens = [];
+let currentRound = 0;
+
+const numQueensSelect = document.getElementById("numQueens");
+const startBtn = document.getElementById("startBtn");
+const queensListDiv = document.getElementById("queensList");
+const statusTextDiv = document.getElementById("statusText");
+const nextRoundBtn = document.getElementById("nextRoundBtn");
+const winnerTextDiv = document.getElementById("winnerText");
+
+// Fyll dropdown med antal queens
+for(let i=2; i<=20; i++) {
+  const opt = document.createElement("option");
+  opt.value = i;
+  opt.textContent = i;
+  numQueensSelect.appendChild(opt);
+}
+
+function shuffle(array) {
+  let currentIndex = array.length, randomIndex;
+  while(currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  }
+  return array;
+}
+
+function renderQueens() {
+  queensListDiv.innerHTML = "";
+  activeQueens.forEach(q => {
+    const div = document.createElement("div");
+    div.textContent = q;
+    div.className = "queen";
+    queensListDiv.appendChild(div);
+  });
+  eliminatedQueens.forEach(q => {
+    const div = document.createElement("div");
+    div.textContent = q;
+    div.className = "queen eliminated";
+    queensListDiv.appendChild(div);
+  });
+}
+
+function startCompetition() {
+  const count = parseInt(numQueensSelect.value);
+  winnerTextDiv.textContent = "";
+  currentRound = 1;
+  eliminatedQueens = [];
+  
+  const shuffled = shuffle([...allQueens]);
+  activeQueens = shuffled.slice(0,count);
+
+  statusTextDiv.textContent = `Runda ${currentRound}: Utmaningen är "${getRandomItem(challenges)}"`;
+  renderQueens();
+  
+  startBtn.style.display = "none";
+  numQueensSelect.disabled = true;
+  queensListDiv.style.display = "flex";
+  nextRoundBtn.style.display = "inline-block";
+}
+
 function getRandomItem(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function simulate() {
-    const selectedQueen = document.getElementById("queenSelect").value;
-    const selectedChallenge = document.getElementById("challengeSelect").value;
-    const song = getRandomItem(songs);
-
-    // Enkel slumpmässig bedömning
-    const performance = Math.random();
-
-    let outcome = "";
-    if (performance > 0.7) {
-        outcome = `${selectedQueen} slår knock out i ${selectedChallenge} och levererar en fantastisk prestation! 🎉`;
-    } else if (performance > 0.4) {
-        outcome = `${selectedQueen} gör ett stabilt framträdande i ${selectedChallenge}, men kan förbättras.`;
-    } else {
-        outcome = `Uh oh, ${selectedQueen} kämpar i ${selectedChallenge} och riskerar eliminering... 😬`;
-    }
-
-    const resultArea = document.getElementById("resultArea");
-    resultArea.innerHTML = `
-        <p>${outcome}</p>
-        <p>🎵 Låt: <strong>${song}</strong></p>
-    `;
+function simulateRound() {
+  if (activeQueens.length <= 1) {
+    return;
+  }
+  const challenge = getRandomItem(challenges);
+  const song = getRandomItem(songs);
+  
+  // Simulera prestationer: slumpa score för varje queen
+  let scores = activeQueens.map(q => ({queen:q, score: Math.random()}));
+  scores.sort((a,b) => b.score - a.score);
+  
+  // Sämst presterande queen elimineras
+  const eliminated = scores[scores.length -1].queen;
+  eliminatedQueens.push(eliminated);
+  activeQueens = activeQueens.filter(q => q !== eliminated);
+  
+  statusTextDiv.innerHTML = `
+    <strong>Runda ${currentRound}</strong>: Utmaningen är "<em>${challenge}</em>".<br />
+    <strong>Resultat:</strong> ${scores[0].queen} briljerar och vinner rundan!<br />
+    Tyvärr elimineras <strong>${eliminated}</strong> efter en lipsync till "${song}". 💔
+  `;
+  renderQueens();
+  
+  currentRound++;
+  
+  if (activeQueens.length === 1) {
+    declareWinner();
+  }
 }
 
-// Fyll dropdowns med data
-function fillDropdown(id, arr) {
-    const select = document.getElementById(id);
-    arr.forEach(item => {
-        const option = document.createElement("option");
-        option.value = item;
-        option.textContent = item;
-        select.appendChild(option);
-    });
+function declareWinner() {
+  nextRoundBtn.style.display = "none";
+  statusTextDiv.textContent = "";
+  winnerTextDiv.textContent = `🏆 ${activeQueens[0]} är vinnaren av RuPaul’s Drag Race Simulator! 🏆`;
 }
 
-document.getElementById("simulateBtn").addEventListener("click", simulate);
-
-fillDropdown("queenSelect", queens);
-fillDropdown("challengeSelect", challenges);
+startBtn.addEventListener("click", startCompetition);
+nextRoundBtn.addEventListener("click", simulateRound);
 </script>
 
 </body>
